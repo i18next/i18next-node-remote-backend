@@ -81,7 +81,7 @@ function inc(version) {
   }
 
   // get all the files to bump version in
-  return gulp.src(['./package.json', './bower.json'])
+  return gulp.src(['./package.json'])
     // bump the version number in those files
     .pipe(type ? bump({type: type}) : bump({version: version}))
     // save it back to filesystem
