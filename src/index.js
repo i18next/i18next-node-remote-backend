@@ -50,9 +50,9 @@ class Backend {
 
   loadUrl(url, callback) {
     ajax(url, (data, res) => {
-      const statusCode = res.statusCode;
-      if (statusCode.indexOf('5') === 0) return callback('failed loading ' + url, true /* retry */);
-      if (statusCode.indexOf('4') === 0) return callback('failed loading ' + url, false /* no retry */);
+      const statusCode = res.statusCode && res.statusCode.toString();
+      if (statusCode && statusCode.indexOf('5') === 0) return callback('failed loading ' + url, true /* retry */);
+      if (statusCode && statusCode.indexOf('4') === 0) return callback('failed loading ' + url, false /* no retry */);
 
       let ret, err;
       try {
