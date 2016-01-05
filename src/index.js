@@ -1,4 +1,3 @@
-import * as utils from './utils';
 import request from 'request';
 
 // https://gist.github.com/Xeoncross/7663273
@@ -6,12 +5,12 @@ function ajax(url, callback, data) {
   if (data) {
     request.post({url: url, body: body, json: true}, function(err, res, body) {
       if (err) console.log(err);
-      callback(body, res);
+      callback(err, body, res);
     });
   } else {
     request(url, function(err, res, body) {
       if (err) console.log(err);
-      callback(body, res);
+      callback(err, body, res);
     });
   }
 };
@@ -26,6 +25,7 @@ function getDefaults() {
 
 class Backend {
   constructor(services, options = {}) {
+    this.options = options;
     this.init(services, options);
 
     this.type = 'backend';
@@ -33,7 +33,7 @@ class Backend {
 
   init(services, options = {}) {
     this.services = services;
-    this.options = utils.defaults(options, this.options || {}, getDefaults());
+    this.options = {...getDefaults(), ...this.options, ...options};
   }
 
   readMulti(languages, namespaces, callback) {
@@ -49,12 +49,14 @@ class Backend {
   }
 
   loadUrl(url, callback) {
-    ajax(url, (data, res) => {
+    ajax(url, (err, data, res) => {
+      if (err) return callback(err, true); // retry
+
       const statusCode = res.statusCode && res.statusCode.toString();
       if (statusCode && statusCode.indexOf('5') === 0) return callback('failed loading ' + url, true /* retry */);
       if (statusCode && statusCode.indexOf('4') === 0) return callback('failed loading ' + url, false /* no retry */);
 
-      let ret, err;
+      let ret;
       try {
         ret = JSON.parse(data);
       } catch (e) {
@@ -74,7 +76,7 @@ class Backend {
     languages.forEach(lng => {
       let url = this.services.interpolator.interpolate(this.options.addPath, { lng: lng, ns: namespace });
 
-      ajax(url, function(data, res) {
+      ajax(url, function(err, data, res) {
         //const statusCode = xhr.status.toString();
         // TODO: if statusCode === 4xx do log
       }, payload);
