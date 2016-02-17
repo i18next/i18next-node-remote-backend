@@ -7,7 +7,7 @@ This is a i18next backend to be used node.js. It will load resources from a remo
 Source can be loaded via [npm](https://www.npmjs.com/package/i18next-node-remote-backend).
 
 ```
-$ npm install i18next-node-fs-backend
+$ npm install i18next-node-remote-backend
 ```
 
 Wiring up:
