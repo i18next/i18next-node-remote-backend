@@ -7,8 +7,7 @@ var gulp = require('gulp'),
     tag_version = require('gulp-tag-version'),
     shell = require('gulp-shell'),
     argv = require('yargs').argv,
-    eslint = require('gulp-eslint'),
-    Server = require('karma').Server;
+    eslint = require('gulp-eslint');
 
 var pkg = require('./package.json');
 
@@ -21,26 +20,7 @@ gulp.task('eslint', function () {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('test', function (done) {
-  new Server({
-    configFile: __dirname + '/karma.conf.js',
-    singleRun: true,
-    reporters: [ 'spec', 'coverage' ],
-  }, done).start();
-});
 
-gulp.task('test_compat', function (done) {
-  new Server({
-    configFile: __dirname + '/karma.backward.conf.js'
-  }, done).start();
-});
-
-
-gulp.task('tdd', function (done) {
-  new Server({
-    configFile: __dirname + '/karma.conf.js'
-  }, done).start();
-});
 
 gulp.task('babel', function () {
   return gulp.src('./src/**/*.js')
