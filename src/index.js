@@ -19,21 +19,29 @@ function getDefaults() {
   return {
     loadPath: '/locales/{{lng}}/{{ns}}.json',
     addPath: 'locales/add/{{lng}}/{{ns}}',
-    allowMultiLoading: false
+    allowMultiLoading: false,
+    reloadInterval: false
   };
 }
 
 class Backend {
-  constructor(services, options = {}) {
+  constructor(services, options = {}, allOptions = {}) {
     this.options = options;
-    this.init(services, options);
+    this.init(services, options, allOptions);
 
     this.type = 'backend';
   }
 
-  init(services, options = {}) {
+  init(services, options = {}, allOptions = {}) {
     this.services = services;
     this.options = {...getDefaults(), ...this.options, ...options};
+    this.allOptions = allOptions;
+
+    if (this.options.reloadInterval) {
+      setInterval(() => {
+        this.reload();
+      }, this.options.reloadInterval);
+    }
   }
 
   readMulti(languages, namespaces, callback) {
@@ -80,6 +88,41 @@ class Backend {
         //const statusCode = xhr.status.toString();
         // TODO: if statusCode === 4xx do log
       }, payload);
+    });
+  }
+
+  reload() {
+    const { backendConnector, languageUtils, logger } = this.services;
+    const currentLanguage = backendConnector.language;
+    if (currentLanguage && currentLanguage.toLowerCase() === 'cimode') return; // avoid loading resources for cimode
+
+    let toLoad = [];
+
+    let append = lng => {
+      let lngs = languageUtils.toResolveHierarchy(lng);
+      lngs.forEach(l => {
+        if (toLoad.indexOf(l) < 0) toLoad.push(l);
+      });
+    };
+
+    append(currentLanguage);
+
+    if (this.allOptions.preload) {
+      this.allOptions.preload.forEach(l => {
+        append(l);
+      });
+    }
+
+    toLoad.forEach(lng => {
+      this.allOptions.ns.forEach(ns => {
+        backendConnector.read(lng, ns, 'read', null, null, (err, data) => {
+          if (err) logger.warn(`loading namespace ${ns} for language ${lng} failed`, err);
+          if (!err && data) logger.log(`loaded namespace ${ns} for language ${lng}`, data);
+
+          const langLoaded = (!err && data) ? data[lng][ns] : data;
+          backendConnector.loaded(`${lng}|${ns}`, err, langLoaded);
+        });
+      });
     });
   }
 }
