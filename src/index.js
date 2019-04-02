@@ -119,8 +119,7 @@ class Backend {
           if (err) logger.warn(`loading namespace ${ns} for language ${lng} failed`, err);
           if (!err && data) logger.log(`loaded namespace ${ns} for language ${lng}`, data);
 
-          const langLoaded = (!err && data) ? data[lng][ns] : data;
-          backendConnector.loaded(`${lng}|${ns}`, err, langLoaded);
+          backendConnector.loaded(`${lng}|${ns}`, err, data);
         });
       });
     });
