@@ -20,7 +20,8 @@ function getDefaults() {
     loadPath: '/locales/{{lng}}/{{ns}}.json',
     addPath: 'locales/add/{{lng}}/{{ns}}',
     allowMultiLoading: false,
-    reloadInterval: false
+    reloadInterval: false,
+    ajax: ajax
   };
 }
 
@@ -57,7 +58,7 @@ class Backend {
   }
 
   loadUrl(url, callback) {
-    ajax(url, (err, data, res) => {
+    this.options.ajax(url, (err, data, res) => {
       if (err) return callback(err, true); // retry
 
       const statusCode = res.statusCode && res.statusCode.toString();
@@ -84,7 +85,7 @@ class Backend {
     languages.forEach(lng => {
       let url = this.services.interpolator.interpolate(this.options.addPath, { lng: lng, ns: namespace });
 
-      ajax(url, function(err, data, res) {
+      this.options.ajax(url, function(err, data, res) {
         //const statusCode = xhr.status.toString();
         // TODO: if statusCode === 4xx do log
       }, payload);
