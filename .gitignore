@@ -11,7 +11,6 @@ npm-debug.log.*
 *~
 *.swp
 
-
 # Ignore various Node.js related directories and files
 node_modules
 node_modules/**/*
@@ -20,3 +19,5 @@ coverage/**/*
 # IntelliJ project files
 .idea
 *.iml
+
+package-lock.json
