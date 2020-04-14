@@ -1,3 +1,9 @@
+# DEPRECATED
+
+Can be replaced with: [i18next-http-backend](https://github.com/i18next/i18next-http-backend)
+
+---
+
 # Introduction
 
 This is a i18next backend to be used node.js. It will load resources from a remote server using request module. It's for the node.js server what the [i18next-xhr-backend](https://github.com/i18next/i18next-xhr-backend) is for the browser.
